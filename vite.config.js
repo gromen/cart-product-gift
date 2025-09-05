@@ -4,8 +4,8 @@ export default {
   plugins: [
     shopify({
       additionalEntrypoints: [
-        'frontend/cart-progress-bar.js',
-        'frontend/cart-progress-bar.css',
+        'frontend/cart-free-sample.js',
+        'frontend/cart-free-sample.css',
       ],
 
       snippetFile: 'vite-tag.liquid',
