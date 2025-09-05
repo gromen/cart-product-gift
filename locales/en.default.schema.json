@@ -352,8 +352,8 @@
         },
         "cart_free_sample_message": {
           "label": "Progress message",
-          "default": "Add {amount} more to get a free sample!",
-          "info": "Use {amount} placeholder for remaining amount"
+          "default": "Add [amount] more to get a free sample!",
+          "info": "Use [amount] placeholder for remaining amount"
         },
         "cart_free_sample_bar_color": {
           "label": "Progress bar color",

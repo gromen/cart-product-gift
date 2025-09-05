@@ -1480,8 +1480,8 @@
         "type": "text",
         "id": "cart_free_sample_message",
         "label": "t:settings_schema.cart.settings.cart_free_sample_message.label",
-        "default": "Add {amount} more to get a free sample!",
-        "info": "Use {amount} placeholder for remaining amount"
+        "default": "Add [amount] more to get a free sample!",
+        "info": "Use [amount] placeholder for remaining amount"
       },
       {
         "type": "color",

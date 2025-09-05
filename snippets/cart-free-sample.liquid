@@ -1,0 +1,97 @@
+{%- liquid
+  # Check if the feature is enabled
+  assign free_sample_enabled = settings.cart_free_sample_enabled | default: false
+  unless free_sample_enabled
+    break
+  endunless
+
+  # Get settings (threshold already in PLN, convert to grosze)
+  assign threshold = settings.cart_free_sample_threshold | times: 100 | default: 25000
+  assign sample_product = settings.cart_free_sample_product
+  assign progress_message = settings.cart_free_sample_message | default: 'Add [amount] more to get a free sample!'
+
+  # Validate that progress message contains the [amount] placeholder
+  unless progress_message contains '[amount]'
+    echo '<div class="cartFreeSample__error" style="background: #ff6b6b; color: white; padding: 10px; margin: 10px; border-radius: 4px;">⚠️ Error: Progress message must include the [amount] placeholder. Current message: "' | append: progress_message | append: '"</div>'
+    break
+  endunless
+
+  # Check cart total
+  assign cart_total = cart.total_price | default: 0
+  assign remaining_amount = threshold | minus: cart_total
+  assign progress_percentage = cart_total | times: 100 | divided_by: threshold
+%}
+
+{%- liquid
+  # Limit percentage to 100%
+  if progress_percentage > 100
+    assign progress_percentage = 100
+  endif
+
+  # Check if the sample is already in the cart
+  assign sample_in_cart = false
+  if sample_product != blank
+    for item in cart.items
+      if item.product.id == sample_product.id
+        assign sample_in_cart = true
+        break
+      endif
+    endfor
+  endif
+-%}
+
+<div
+  class='cartFreeSample'
+  data-threshold='{{ threshold }}'
+  data-cart-total='{{ cart_total }}'
+  data-sample-product-id='{{ sample_product.id }}'
+  data-currency='{{ cart.currency.symbol }}'
+>
+  <div class='cartFreeSample__header'>
+    <h4 class='cartFreeSample__title'>Free Sample Progress</h4>
+  </div>
+
+  <div class='cartFreeSample__progressContainer'>
+    <div class='cartFreeSample__progressTrack'>
+      <div
+        class='cartFreeSample__progressFill'
+        style='width: {{ progress_percentage }}%'
+      ></div>
+    </div>
+    <div class='cartFreeSample__progressPercentage'>
+      {{ progress_percentage }}%
+    </div>
+  </div>
+
+  <div class='cartFreeSample__message'>
+    {%- if remaining_amount > 0 -%}
+      {%- assign remaining_money = remaining_amount | money -%}
+      <span class='cartFreeSample__messageText'>
+        {{ progress_message | replace: '[amount]', remaining_money }}
+      </span>
+
+    {%- else -%}
+      <span class='cartFreeSample__messageSuccess'>
+        🎉 Congratulations! Free sample unlocked!
+      </span>
+    {%- endif -%}
+  </div>
+
+  {%- if sample_product != blank -%}
+    <div class='cartFreeSample__product'>
+      <img
+        src='{{ sample_product.featured_image | image_url: width: 60 }}'
+        alt='{{ sample_product.title }}'
+        class='cartFreeSample__productImage'
+        width='60'
+        height='60'
+      >
+      <div class='cartFreeSample__productInfo'>
+        <span class='cartFreeSample__productTitle'>
+          {{- sample_product.title -}}
+        </span>
+        <span class='cartFreeSample__productPrice'>FREE</span>
+      </div>
+    </div>
+  {%- endif -%}
+</div>
