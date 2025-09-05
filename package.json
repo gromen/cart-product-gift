@@ -1,0 +1,41 @@
+{
+  "name": "cart-product-gift",
+  "version": "1.0.0",
+  "description": "Shopify Dawn theme with cart progress bar and free gift functionality",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "shopify:dev": "shopify theme dev --store cart-product-gift.myshopify.com",
+    "shopify:push": "shopify theme push",
+    "shopify:pull": "shopify theme pull",
+    "dev:parallel": "concurrently \"npm run shopify:dev\" \"npm run dev\"",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write ."
+  },
+  "keywords": [
+    "shopify",
+    "theme",
+    "dawn",
+    "cart",
+    "progress-bar",
+    "e-commerce",
+    "vite"
+  ],
+  "author": "Marcin Gromek",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "prettier": "^3.3.3",
+    "vite": "^5.4.0",
+    "vite-plugin-shopify": "^3.1.0",
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
