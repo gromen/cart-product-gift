@@ -292,6 +292,10 @@ class CartItems extends HTMLElement {
       });
   }
 
+  isSampleProduct(item) {
+    return item.properties && item.properties.free_sample === 'true';
+  }
+
   updateFreeSampleDisplay(freeProductSample, cartTotal, threshold, currency) {
     const remainingAmount = threshold - cartTotal;
     const progressPercentage = Math.min(
@@ -362,7 +366,7 @@ class CartItems extends HTMLElement {
 
     // Check if cart is empty (excluding samples) - remove any existing samples
     const nonSampleItems = parsedState.items.filter(
-      (item) => !(item.properties && item.properties.free_sample === 'true')
+      (item) => !this.isSampleProduct(item)
     );
 
     // Hide component if cart is completely empty or has no regular products
@@ -391,13 +395,12 @@ class CartItems extends HTMLElement {
 
     // Check if sample is already in cart (check by variant_id AND by _free_sample property)
     const sampleAlreadyInCart = parsedState.items.some((item) => {
-      // Check if item has _free_sample property
-      const isFreeSimple =
-        item.properties && item.properties.free_sample === 'true';
+      // Check if this is a sample product
+      const isSample = this.isSampleProduct(item);
       // Check if same variant ID
       const sameVariant =
         item.variant_id.toString() === sampleProductId.toString();
-      return isFreeSimple || sameVariant;
+      return isSample || sameVariant;
     });
 
     if (sampleAlreadyInCart) {
@@ -460,8 +463,8 @@ class CartItems extends HTMLElement {
 
   removeSampleProductIfExists(parsedState) {
     // Check if any sample products exist in cart
-    const sampleItems = parsedState.items.filter(
-      (item) => item.properties && item.properties.free_sample === 'true'
+    const sampleItems = parsedState.items.filter((item) =>
+      this.isSampleProduct(item)
     );
 
     if (sampleItems.length === 0) {

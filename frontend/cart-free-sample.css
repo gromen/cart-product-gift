@@ -81,7 +81,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 10px;
 }
 
 .cartFreeSample__productTitle {
@@ -89,6 +89,15 @@
   font-weight: 500;
   color: #333;
   line-height: 1.3;
+
+  & a {
+    color: #1b4a3c;
+    text-decoration: none;
+  }
+
+  & a:hover {
+    text-decoration: underline;
+  }
 }
 
 .cartFreeSample__productPrice {

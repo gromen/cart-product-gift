@@ -106,16 +106,11 @@
 
               <tbody>
                 {%- for item in cart.items -%}
-                  {%- comment -%} Check if this is a free sample - define at the start of loop {%- endcomment -%}
+                  {%- comment -%} Check if this is a free sample by checking template suffix {%- endcomment -%}
                   {%- assign is_free_sample = false -%}
-                  {%- for property in item.properties -%}
-                    {%- if property.first == 'free_sample'
-                      and property.last == 'true'
-                    -%}
-                      {%- assign is_free_sample = true -%}
-                      {%- break -%}
-                    {%- endif -%}
-                  {%- endfor -%}
+                  {%- if item.product.template_suffix == 'sample' -%}
+                    {%- assign is_free_sample = true -%}
+                  {%- endif -%}
 
                   <tr
                     class='cart-item {% if item.parent_relationship.parent != null %}cart-item__nested-line{% endif %}'

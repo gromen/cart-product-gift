@@ -20,7 +20,7 @@
   assign sample_in_cart = false
 
   for item in cart.items
-    if item.properties.free_sample == 'true'
+    if item.product.template_suffix == 'sample'
       continue
     endif
 
@@ -84,9 +84,6 @@
         class='cartFreeSample__progressFill'
         style='width: {{ progress_percentage }}%'
       ></div>
-    </div>
-    <div class='cartFreeSample__progressPercentage'>
-      {{ progress_percentage }}%
     </div>
   </div>
 
