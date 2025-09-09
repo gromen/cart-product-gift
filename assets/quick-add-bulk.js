@@ -8,7 +8,10 @@ if (!customElements.get('quick-add-bulk')) {
 
         const debouncedOnChange = debounce((event) => {
           if (parseInt(event.target.value) === 0) {
-            this.startQueue(event.target.dataset.index, parseInt(event.target.value));
+            this.startQueue(
+              event.target.dataset.index,
+              parseInt(event.target.value)
+            );
           } else {
             this.validateQuantity(event);
           }
@@ -21,20 +24,27 @@ if (!customElements.get('quick-add-bulk')) {
       }
 
       connectedCallback() {
-        this.cartUpdateUnsubscriber = subscribe(PUB_SUB_EVENTS.cartUpdate, (event) => {
-          if (
-            event.source === 'quick-add' ||
-            (event.cartData.items && !event.cartData.items.some((item) => item.id === parseInt(this.dataset.index))) ||
-            (event.cartData.variant_id && !(event.cartData.variant_id === parseInt(this.dataset.index)))
-          ) {
-            return;
+        this.cartUpdateUnsubscriber = subscribe(
+          PUB_SUB_EVENTS.cartUpdate,
+          (event) => {
+            if (
+              event.source === 'quick-add' ||
+              (event.cartData.items &&
+                !event.cartData.items.some(
+                  (item) => item.id === parseInt(this.dataset.index)
+                )) ||
+              (event.cartData.variant_id &&
+                !(event.cartData.variant_id === parseInt(this.dataset.index)))
+            ) {
+              return;
+            }
+            // If its another section that made the update
+            this.onCartUpdate().then(() => {
+              this.listenForActiveInput();
+              this.listenForKeydown();
+            });
           }
-          // If its another section that made the update
-          this.onCartUpdate().then(() => {
-            this.listenForActiveInput();
-            this.listenForKeydown();
-          });
-        });
+        );
       }
 
       disconnectedCallback() {
@@ -53,7 +63,9 @@ if (!customElements.get('quick-add-bulk')) {
 
       listenForActiveInput() {
         if (!this.classList.contains('hidden')) {
-          this.input?.addEventListener('focusin', (event) => event.target.select());
+          this.input?.addEventListener('focusin', (event) =>
+            event.target.select()
+          );
         }
         this.isEnterPressed = false;
       }
@@ -79,7 +91,9 @@ if (!customElements.get('quick-add-bulk')) {
 
       get sectionId() {
         if (!this._sectionId) {
-          this._sectionId = this.closest('.collection-quick-add-bulk').dataset.id;
+          this._sectionId = this.closest(
+            '.collection-quick-add-bulk'
+          ).dataset.id;
         }
 
         return this._sectionId;
@@ -90,8 +104,13 @@ if (!customElements.get('quick-add-bulk')) {
           fetch(`${this.getSectionsUrl()}?section_id=${this.sectionId}`)
             .then((response) => response.text())
             .then((responseText) => {
-              const html = new DOMParser().parseFromString(responseText, 'text/html');
-              const sourceQty = html.querySelector(`#quick-add-bulk-${this.dataset.index}-${this.sectionId}`);
+              const html = new DOMParser().parseFromString(
+                responseText,
+                'text/html'
+              );
+              const sourceQty = html.querySelector(
+                `#quick-add-bulk-${this.dataset.index}-${this.sectionId}`
+              );
               if (sourceQty) {
                 this.innerHTML = sourceQty.innerHTML;
               }
@@ -117,7 +136,9 @@ if (!customElements.get('quick-add-bulk')) {
         const ids = Object.keys(items);
         const body = JSON.stringify({
           updates: items,
-          sections: this.getSectionsToRender().map((section) => section.section),
+          sections: this.getSectionsToRender().map(
+            (section) => section.section
+          ),
           sections_url: this.getSectionsUrl(),
         });
 
@@ -128,7 +149,10 @@ if (!customElements.get('quick-add-bulk')) {
           .then((state) => {
             const parsedState = JSON.parse(state);
             this.renderSections(parsedState, ids);
-            publish(PUB_SUB_EVENTS.cartUpdate, { source: 'quick-add', cartData: parsedState });
+            publish(PUB_SUB_EVENTS.cartUpdate, {
+              source: 'quick-add',
+              cartData: parsedState,
+            });
           })
           .catch(() => {
             // Commented out for now and will be fixed when BE issue is done https://github.com/Shopify/shopify/issues/440605
@@ -166,12 +190,19 @@ if (!customElements.get('quick-add-bulk')) {
       }
 
       renderSections(parsedState, ids) {
-        const intersection = this.queue.filter((element) => ids.includes(element.id));
+        const intersection = this.queue.filter((element) =>
+          ids.includes(element.id)
+        );
         if (intersection.length !== 0) return;
         this.getSectionsToRender().forEach((section) => {
           const sectionElement = document.getElementById(section.id);
           if (section.section === 'cart-drawer') {
-            sectionElement.closest('cart-drawer')?.classList.toggle('is-empty', parsedState.items.length.length === 0);
+            sectionElement
+              .closest('cart-drawer')
+              ?.classList.toggle(
+                'is-empty',
+                parsedState.items.length.length === 0
+              );
           }
           const elementToReplace =
             sectionElement && sectionElement.querySelector(section.selector)

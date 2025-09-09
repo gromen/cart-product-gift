@@ -11,7 +11,5 @@
       }
     }
   },
-  "order": [
-    "main"
-  ]
+  "order": ["main"]
 }

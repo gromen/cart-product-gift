@@ -12,7 +12,9 @@ if (!customElements.get('share-button')) {
           successMessage: this.querySelector('[id^="ShareMessage"]'),
           urlInput: this.querySelector('input'),
         };
-        this.urlToShare = this.elements.urlInput ? this.elements.urlInput.value : document.location.href;
+        this.urlToShare = this.elements.urlInput
+          ? this.elements.urlInput.value
+          : document.location.href;
 
         if (navigator.share) {
           this.mainDetailsToggle.setAttribute('hidden', '');
@@ -21,11 +23,16 @@ if (!customElements.get('share-button')) {
             navigator.share({ url: this.urlToShare, title: document.title });
           });
         } else {
-          this.mainDetailsToggle.addEventListener('toggle', this.toggleDetails.bind(this));
+          this.mainDetailsToggle.addEventListener(
+            'toggle',
+            this.toggleDetails.bind(this)
+          );
           this.mainDetailsToggle
             .querySelector('.share-button__copy')
             .addEventListener('click', this.copyToClipboard.bind(this));
-          this.mainDetailsToggle.querySelector('.share-button__close').addEventListener('click', this.close.bind(this));
+          this.mainDetailsToggle
+            .querySelector('.share-button__close')
+            .addEventListener('click', this.close.bind(this));
         }
       }
 
@@ -41,7 +48,8 @@ if (!customElements.get('share-button')) {
       copyToClipboard() {
         navigator.clipboard.writeText(this.elements.urlInput.value).then(() => {
           this.elements.successMessage.classList.remove('hidden');
-          this.elements.successMessage.textContent = window.accessibilityStrings.shareSuccess;
+          this.elements.successMessage.textContent =
+            window.accessibilityStrings.shareSuccess;
           this.elements.closeButton.classList.remove('hidden');
           this.elements.closeButton.focus();
         });

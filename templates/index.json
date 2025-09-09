@@ -22,10 +22,7 @@
           }
         }
       },
-      "block_order": [
-        "heading",
-        "button"
-      ],
+      "block_order": ["heading", "button"],
       "settings": {
         "image_overlay_opacity": 40,
         "image_height": "large",
@@ -68,8 +65,5 @@
       }
     }
   },
-  "order": [
-    "image_banner",
-    "featured_collection"
-  ]
+  "order": ["image_banner", "featured_collection"]
 }
