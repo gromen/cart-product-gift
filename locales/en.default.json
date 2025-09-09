@@ -257,7 +257,8 @@
     },
     "cart": {
       "cart": "Cart",
-      "cart_free_sample_badge_text": "FREE SAMPLE"
+      "cart_free_sample_badge_text": "FREE SAMPLE",
+      "cart_free_sample_message_success": "🎉 Congratulations! Free sample unlocked!"
     },
     "contact": {
       "form": {

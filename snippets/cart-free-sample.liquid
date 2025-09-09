@@ -68,10 +68,9 @@
     color: {{ settings.cart_free_sample_bar_color | default: '#1B4A3C' }};
   }
 {% endstyle %}
-
 <div
   style='--bg-color: {{ settings.cart_free_sample_background_color | default: '#e5e5e538' }};'
-  class='cartFreeSample js-cartFreeSample{% if progress_percentage >= 100 %} cartFreeSample--completed{% endif %}'
+  class='cartFreeSample js-cartFreeSample{% if progress_percentage >= 100 %} cartFreeSample--completed{% endif %}{% if sample_in_cart %} hidden{% endif %}'
   data-threshold='{{ threshold }}'
   data-cart-total='{{ cart_total }}'
   data-sample-product-id='{{ sample_product.variants.first.id }}'
@@ -96,7 +95,7 @@
 
     {%- else -%}
       <span class='cartFreeSample__messageSuccess'>
-        🎉 Congratulations! Free sample unlocked!
+        {{- 'templates.cart.cart_free_sample_message_success' | t -}}
       </span>
     {%- endif -%}
   </div>
@@ -112,9 +111,7 @@
       >
       <div class='cartFreeSample__productInfo'>
         <span class='cartFreeSample__productTitle'>
-          <a href='{{ sample_product.url }}'>
-            {{- sample_product.title -}}
-          </a>
+          {{- sample_product.title -}}
         </span>
         <span class='cartFreeSample__productPrice'>
           {{- 'templates.cart.cart_free_sample_badge_text' | t -}}
