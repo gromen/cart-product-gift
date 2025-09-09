@@ -1494,6 +1494,12 @@
         "id": "cart_free_sample_background_color",
         "label": "t:settings_schema.cart.settings.cart_free_sample_background_color.label",
         "default": "#E5E5E5"
+      },
+      {
+        "type": "color",
+        "id": "cart_free_sample_progress_track_color",
+        "label": "t:settings_schema.cart.settings.cart_free_sample_progress_track_color.label",
+        "default": "#E5E5E5"
       }
     ]
   }

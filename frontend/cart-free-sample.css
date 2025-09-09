@@ -1,7 +1,3 @@
-:root {
-  --bg-color: #e5e5e538;
-}
-
 .cartFreeSample {
   background-color: var(--bg-color);
   border: 1px solid #e0e0e0;
@@ -20,7 +16,7 @@
 
 .cartFreeSample__progressTrack {
   flex: 1;
-  background-color: #e5e5e5;
+  background-color: var(--cartFreeSampleProgressTrackColor);
   border-radius: 10px;
   height: 8px;
   overflow: hidden;
@@ -28,7 +24,7 @@
 }
 
 .cartFreeSample__progressFill {
-  background-color: #1b4a3c;
+  background-color: var(--cartFreeSampleBarColor);
   height: 100%;
   border-radius: 10px;
   transition: width 0.3s ease;

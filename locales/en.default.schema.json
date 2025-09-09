@@ -362,6 +362,9 @@
         "cart_free_sample_background_color": {
           "label": "Progress bar background",
           "default": "#E5E5E5"
+        },
+        "cart_free_sample_progress_track_color": {
+          "label": "Progress track color"
         }
       }
     },
