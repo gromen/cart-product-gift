@@ -313,10 +313,15 @@ class CartItems extends HTMLElement {
       (item) => !(item.properties && item.properties.free_sample === 'true')
     );
 
-    if (nonSampleItems.length === 0) {
+    // Hide component if cart is completely empty or has no regular products
+    if (parsedState.item_count === 0 || nonSampleItems.length === 0) {
+      freeProductSample.classList.add('hidden');
       this.removeSampleProductIfExists(parsedState);
       return;
     }
+
+    // Show component if there are regular products
+    freeProductSample.classList.remove('hidden');
 
     // If threshold not reached, check if we need to remove existing sample
     if (currentCartTotal < threshold) {
