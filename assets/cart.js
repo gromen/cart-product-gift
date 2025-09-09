@@ -312,7 +312,7 @@ class CartItems extends HTMLElement {
     return item.properties && item.properties.free_sample === 'true';
   }
 
-  updateFreeSampleDisplay(freeProductSample, cartTotal, threshold, currency) {
+  updateFreeSampleDisplay(freeProductSample, cartTotal, threshold) {
     const remainingAmount = threshold - cartTotal;
     const progressPercentage = Math.min(
       Math.round((cartTotal * 100) / threshold),
