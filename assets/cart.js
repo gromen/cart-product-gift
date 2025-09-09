@@ -340,10 +340,13 @@ class CartItems extends HTMLElement {
     );
     if (!messageContainer) return;
 
-    // Get progress message template from a data attribute or use default
+    // Get message templates from data attributes or use defaults
     const progressMessage =
       freeProductSample.dataset.progressMessage ||
       'Add [amount] more to get a free sample!';
+    const successMessage =
+      freeProductSample.dataset.successMessage ||
+      '🎉 Congratulations! Free sample unlocked!';
 
     if (remainingAmount > 0) {
       // Show progress message
@@ -358,7 +361,7 @@ class CartItems extends HTMLElement {
       freeProductSample.classList.remove('cartFreeSample--completed');
     } else {
       // Show success message
-      messageContainer.innerHTML = `<span class='cartFreeSample__messageSuccess'>🎉 Congratulations! Free sample unlocked!</span>`;
+      messageContainer.innerHTML = `<span class='cartFreeSample__messageSuccess'>${successMessage}</span>`;
       freeProductSample.classList.add('cartFreeSample--completed');
     }
   }

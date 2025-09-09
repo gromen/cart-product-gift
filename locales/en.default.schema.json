@@ -355,6 +355,10 @@
           "default": "Add [amount] more to get a free sample!",
           "info": "Use [amount] placeholder for remaining amount"
         },
+        "cart_free_sample_message_success": {
+          "label": "Success message",
+          "default": "🎉 Congratulations! Free sample unlocked!"
+        },
         "cart_free_sample_bar_color": {
           "label": "Progress bar color",
           "default": "#1B4A3C"

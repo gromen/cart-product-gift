@@ -9,6 +9,7 @@
   assign threshold = settings.cart_free_sample_threshold | times: 100 | default: 25000
   assign sample_product_setting = settings.cart_free_sample_product
   assign progress_message = settings.cart_free_sample_message | default: 'Add [amount] more to get a free sample!'
+  assign success_message = settings.cart_free_sample_message_success | default: '🎉 Congratulations! Free sample unlocked!'
 
   # Get actual product object from handle
   if sample_product_setting != blank
@@ -66,6 +67,7 @@
   data-sample-product-id='{{ sample_product.variants.first.id }}'
   data-currency='{{ cart.currency.symbol }}'
   data-progress-message='{{ progress_message | escape }}'
+  data-success-message='{{ success_message | escape }}'
 >
   <div class='cartFreeSample__progressContainer'>
     <div class='cartFreeSample__progressTrack'>
@@ -85,7 +87,7 @@
 
     {%- else -%}
       <span class='cartFreeSample__messageSuccess'>
-        {{- 'templates.cart.cart_free_sample_message_success' | t -}}
+        {{ success_message }}
       </span>
     {%- endif -%}
   </div>
