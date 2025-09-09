@@ -7,8 +7,13 @@
 
   # Get settings (threshold already in PLN, convert to grosze)
   assign threshold = settings.cart_free_sample_threshold | times: 100 | default: 25000
-  assign sample_product = settings.cart_free_sample_product
+  assign sample_product_setting = settings.cart_free_sample_product
   assign progress_message = settings.cart_free_sample_message | default: 'Add [amount] more to get a free sample!'
+
+  # Get actual product object from handle
+  if sample_product_setting != blank
+    assign sample_product = all_products[sample_product_setting]
+  endif
 
   # Validate that progress message contains the [amount] placeholder
   unless progress_message contains '[amount]'
@@ -40,17 +45,27 @@
   endif
 -%}
 
+{% render 'vite-tag' with '@/cart-free-sample.css' %}
+
+{% style %}
+  .cartFreeSample__progressFill {
+    background-color: {{ settings.cart_free_sample_bar_color | default: '#1B4A3C' }};
+  }
+
+  .cartFreeSample__messageSuccess,
+  .cartFreeSample__productPrice {
+    color: {{ settings.cart_free_sample_bar_color | default: '#1B4A3C' }};
+  }
+{% endstyle %}
+
 <div
-  class='cartFreeSample'
+  style='--bg-color: {{ settings.cart_free_sample_background_color | default: '#e5e5e538' }};'
+  class='cartFreeSample js-cartFreeSample{% if progress_percentage >= 100 %} cartFreeSample--completed{% endif %}'
   data-threshold='{{ threshold }}'
   data-cart-total='{{ cart_total }}'
-  data-sample-product-id='{{ sample_product.id }}'
+  data-sample-product-id='{{ sample_product.variants.first.id }}'
   data-currency='{{ cart.currency.symbol }}'
 >
-  <div class='cartFreeSample__header'>
-    <h4 class='cartFreeSample__title'>Free Sample Progress</h4>
-  </div>
-
   <div class='cartFreeSample__progressContainer'>
     <div class='cartFreeSample__progressTrack'>
       <div
@@ -88,7 +103,9 @@
       >
       <div class='cartFreeSample__productInfo'>
         <span class='cartFreeSample__productTitle'>
-          {{- sample_product.title -}}
+          <a href='{{ sample_product.url }}'>
+            {{- sample_product.title -}}
+          </a>
         </span>
         <span class='cartFreeSample__productPrice'>FREE</span>
       </div>

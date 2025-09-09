@@ -60,10 +60,6 @@
       assign body_font_bold_italic = body_font_bold | font_modify: 'style', 'italic'
     %}
 
-    {% if template == 'cart' %}
-      {% render 'vite-tag' with '@/cart-progress-bar.css' %}
-    {% endif %}
-
     {% style %}
       {{ settings.type_body_font | font_face: font_display: 'swap' }}
       {{ body_font_bold | font_face: font_display: 'swap' }}
@@ -427,8 +423,5 @@
     {%- if settings.cart_type == 'drawer' -%}
       <script src='{{ 'cart-drawer.js' | asset_url }}' defer='defer'></script>
     {%- endif -%}
-    {% if template == 'cart' %}
-      {% render 'vite-tag' with '@/cart-progress-bar.js' %}
-    {% endif %}
   </body>
 </html>

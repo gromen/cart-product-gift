@@ -106,6 +106,17 @@
 
               <tbody>
                 {%- for item in cart.items -%}
+                  {%- comment -%} Check if this is a free sample - define at the start of loop {%- endcomment -%}
+                  {%- assign is_free_sample = false -%}
+                  {%- for property in item.properties -%}
+                    {%- if property.first == '_free_sample'
+                      and property.last == 'true'
+                    -%}
+                      {%- assign is_free_sample = true -%}
+                      {%- break -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+
                   <tr
                     class='cart-item {% if item.parent_relationship.parent != null %}cart-item__nested-line{% endif %}'
                     id='CartItem-{{ item.index | plus: 1 }}'
@@ -279,7 +290,7 @@
                     -%}
                     <td class='cart-item__quantity{% if has_qty_rules or has_vol_pricing %} cart-item__quantity--info{% endif %}'>
                       <quantity-popover>
-                        <div class='cart-item__quantity-wrapper quantity-popover-wrapper'>
+                        <div class='cart-item__quantity-wrapper quantity-popover-wrapper {% if is_free_sample %}hidden{% endif %}'>
                           <label
                             class='visually-hidden'
                             for='Quantity-{{ item.index | plus: 1 }}'
@@ -340,9 +351,6 @@
                                 aria-label='{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}'
                                 id='Quantity-{{ item.index | plus: 1 }}'
                                 data-index='{{ item.index | plus: 1 }}'
-                                {% if can_update_quantity == false %}
-                                  disabled
-                                {% endif %}
                               >
                               <button
                                 class='quantity__button'
@@ -368,10 +376,8 @@
                           <cart-remove-button
                             id='Remove-{{ item.index | plus: 1 }}'
                             data-index='{{ item.index | plus: 1 }}'
-                            {% assign can_remove = item.instructions.can_remove
-                              | default: true
-                            %}
-                            {% if can_remove == false %}
+
+                            {% if is_free_sample %}
                               class='hidden'
                             {% endif %}
                           >
