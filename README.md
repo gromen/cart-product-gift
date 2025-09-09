@@ -81,6 +81,106 @@ Sample products are automatically hidden from:
 
 This is achieved by checking `product.template_suffix == 'sample'`.
 
+## Local Development
+
+### Prerequisites
+
+- Node.js >= 18.0.0
+- Shopify CLI
+- Access to a Shopify development store
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone <repository-url>
+cd cart-product-gift
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Configure Shopify CLI (if not already done):
+
+```bash
+shopify auth login
+```
+
+### Development Commands
+
+#### **Shopify Theme Development**
+
+```bash
+# Start Shopify theme development server
+npm run shopify:dev
+
+# Push theme to Shopify store
+npm run shopify:push
+
+# Pull theme from Shopify store
+npm run shopify:pull
+```
+
+#### **Frontend Development**
+
+```bash
+# Start Vite development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Run both Shopify and Vite development servers in parallel
+npm run dev:parallel
+```
+
+#### **Code Quality**
+
+```bash
+# Format code with Biome
+npm run format
+
+# Lint code
+npm run lint
+
+# Lint and auto-fix issues
+npm run lint:fix
+
+# Check code quality
+npm run check
+
+# Check and auto-fix code quality issues
+npm run check:fix
+```
+
+### Development Workflow
+
+1. **Start development environment**:
+
+   ```bash
+   npm run dev:parallel
+   ```
+
+   This runs both Shopify theme development and Vite build processes simultaneously.
+
+2. **Make changes** to theme files (Liquid, CSS, JavaScript)
+
+3. **Preview changes** in your browser using the Shopify development URL
+
+4. **Test the free sample functionality**:
+   - Add products to cart
+   - Verify threshold detection
+   - Test sample product addition/removal
+
+5. **Format and lint code** before committing:
+   ```bash
+   npm run check:fix
+   ```
+
 ## Technical Details
 
 ### How It Works
