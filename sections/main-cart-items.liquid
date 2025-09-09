@@ -109,7 +109,7 @@
                   {%- comment -%} Check if this is a free sample - define at the start of loop {%- endcomment -%}
                   {%- assign is_free_sample = false -%}
                   {%- for property in item.properties -%}
-                    {%- if property.first == '_free_sample'
+                    {%- if property.first == 'free_sample'
                       and property.last == 'true'
                     -%}
                       {%- assign is_free_sample = true -%}
@@ -158,6 +158,15 @@
                         {{- item.product.title | escape -}}
                       </a>
 
+                      {%- if is_free_sample -%}
+                        <span class='cart-item__free-sample-badge'>
+                          {{-
+                            'templates.cart.cart_free_sample_badge_text'
+                            | t
+                          -}}
+                        </span>
+                      {%- endif -%}
+
                       {%- if item.original_price != item.final_price -%}
                         <div class='cart-item__discounted-prices'>
                           <span class='visually-hidden'>
@@ -200,6 +209,7 @@
                             -%}
                             {%- if property.last != blank
                               and property_first_char != '_'
+                              and property.first != 'free_sample'
                             -%}
                               <div class='product-option'>
                                 <dt>{{ property.first }}:</dt>

@@ -247,7 +247,8 @@
       "pages": "Pages"
     },
     "cart": {
-      "cart": "Cart"
+      "cart": "Cart",
+      "cart_free_sample_badge_text": "FREE SAMPLE"
     },
     "contact": {
       "form": {

@@ -308,6 +308,16 @@ class CartItems extends HTMLElement {
       return;
     }
 
+    // Check if cart is empty (excluding samples) - remove any existing samples
+    const nonSampleItems = parsedState.items.filter(
+      (item) => !(item.properties && item.properties.free_sample === 'true')
+    );
+
+    if (nonSampleItems.length === 0) {
+      this.removeSampleProductIfExists(parsedState);
+      return;
+    }
+
     // If threshold not reached, check if we need to remove existing sample
     if (currentCartTotal < threshold) {
       this.removeSampleProductIfExists(parsedState);

@@ -15,6 +15,28 @@
     assign sample_product = all_products[sample_product_setting]
   endif
 
+  # Count non-sample items and check if sample is already in cart
+  assign non_sample_count = 0
+  assign sample_in_cart = false
+
+  for item in cart.items
+    if item.properties.free_sample == 'true'
+      continue
+    endif
+
+    assign non_sample_count = non_sample_count | plus: 1
+
+    # Check if this item is our sample product (only if we have a sample product defined)
+    if sample_product != blank and item.product.id == sample_product.id
+      assign sample_in_cart = true
+    endif
+  endfor
+
+  # Hide component when cart is empty (excluding samples)
+  if non_sample_count == 0
+    break
+  endif
+
   # Validate that progress message contains the [amount] placeholder
   unless progress_message contains '[amount]'
     echo '<div class="cartFreeSample__error" style="background: #ff6b6b; color: white; padding: 10px; margin: 10px; border-radius: 4px;">⚠️ Error: Progress message must include the [amount] placeholder. Current message: "' | append: progress_message | append: '"</div>'
@@ -31,17 +53,6 @@
   # Limit percentage to 100%
   if progress_percentage > 100
     assign progress_percentage = 100
-  endif
-
-  # Check if the sample is already in the cart
-  assign sample_in_cart = false
-  if sample_product != blank
-    for item in cart.items
-      if item.product.id == sample_product.id
-        assign sample_in_cart = true
-        break
-      endif
-    endfor
   endif
 -%}
 
@@ -107,7 +118,9 @@
             {{- sample_product.title -}}
           </a>
         </span>
-        <span class='cartFreeSample__productPrice'>FREE</span>
+        <span class='cartFreeSample__productPrice'>
+          {{- 'templates.cart.cart_free_sample_badge_text' | t -}}
+        </span>
       </div>
     </div>
   {%- endif -%}
