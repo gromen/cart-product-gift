@@ -46,8 +46,9 @@
 
 .cartFreeSample__messageText {
   font-size: 14px;
-  color: #666;
+  color: var(--cartFreeSampleBarColor);
   line-height: 1.4;
+  font-weight: 800;
 }
 
 .cartFreeSample__messageSuccess {

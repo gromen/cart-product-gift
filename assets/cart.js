@@ -323,15 +323,21 @@ class CartItems extends HTMLElement {
     const progressFill = freeProductSample.querySelector(
       '.cartFreeSample__progressFill'
     );
-    const progressText = freeProductSample.querySelector(
-      '.cartFreeSample__progressPercentage'
+    const progressTrack = freeProductSample.querySelector(
+      '.cartFreeSample__progressTrack'
     );
 
     if (progressFill) {
       progressFill.style.width = `${progressPercentage}%`;
     }
-    if (progressText) {
-      progressText.textContent = `${progressPercentage}%`;
+
+    // Update accessibility attributes for progress bar
+    if (progressTrack) {
+      progressTrack.setAttribute('aria-valuenow', progressPercentage);
+      progressTrack.setAttribute(
+        'aria-label',
+        `Progress towards free sample: ${progressPercentage}% complete`
+      );
     }
 
     // Update message content
@@ -357,11 +363,11 @@ class CartItems extends HTMLElement {
 
       const messageText = progressMessage.replace('[amount]', formattedAmount);
 
-      messageContainer.innerHTML = `<span class='cartFreeSample__messageText'>${messageText}</span>`;
+      messageContainer.innerHTML = `<span class='cartFreeSample__messageText' id="free-sample-progress-text">${messageText}</span>`;
       freeProductSample.classList.remove('cartFreeSample--completed');
     } else {
       // Show success message
-      messageContainer.innerHTML = `<span class='cartFreeSample__messageSuccess'>${successMessage}</span>`;
+      messageContainer.innerHTML = `<span class='cartFreeSample__messageSuccess' id="free-sample-success-text">${successMessage}</span>`;
       freeProductSample.classList.add('cartFreeSample--completed');
     }
   }

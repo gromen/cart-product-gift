@@ -68,44 +68,71 @@
   data-currency='{{ cart.currency.symbol }}'
   data-progress-message='{{ progress_message | escape }}'
   data-success-message='{{ success_message | escape }}'
+  role='region'
+  aria-label='Free sample progress'
+  aria-live='polite'
+  aria-atomic='true'
 >
   <div class='cartFreeSample__progressContainer'>
-    <div class='cartFreeSample__progressTrack'>
+    <div
+      class='cartFreeSample__progressTrack'
+      role='progressbar'
+      aria-valuenow='{{ progress_percentage }}'
+      aria-valuemin='0'
+      aria-valuemax='100'
+      aria-label='Progress towards free sample: {{ progress_percentage }}% complete'
+    >
       <div
         class='cartFreeSample__progressFill'
         style='width: {{ progress_percentage }}%'
+        aria-hidden='true'
       ></div>
     </div>
   </div>
 
-  <div class='cartFreeSample__message'>
+  <div class='cartFreeSample__message' aria-live='polite'>
     {%- if remaining_amount > 0 -%}
       {%- assign remaining_money = remaining_amount | money -%}
-      <span class='cartFreeSample__messageText'>
+      <span class='cartFreeSample__messageText' id='free-sample-progress-text'>
         {{ progress_message | replace: '[amount]', remaining_money }}
       </span>
 
     {%- else -%}
-      <span class='cartFreeSample__messageSuccess'>
+      <span
+        class='cartFreeSample__messageSuccess'
+        id='free-sample-success-text'
+      >
         {{ success_message }}
       </span>
     {%- endif -%}
   </div>
 
   {%- if sample_product != blank -%}
-    <div class='cartFreeSample__product'>
+    <div
+      class='cartFreeSample__product'
+      role='group'
+      aria-labelledby='free-sample-product-title'
+    >
       <img
         src='{{ sample_product.featured_image | image_url: width: 60 }}'
-        alt='{{ sample_product.title }}'
+        alt='{{ sample_product.title | escape }}'
         class='cartFreeSample__productImage'
         width='60'
         height='60'
+        loading='lazy'
+        decoding='async'
       >
       <div class='cartFreeSample__productInfo'>
-        <span class='cartFreeSample__productTitle'>
+        <span
+          class='cartFreeSample__productTitle'
+          id='free-sample-product-title'
+        >
           {{- sample_product.title -}}
         </span>
-        <span class='cartFreeSample__productPrice'>
+        <span
+          class='cartFreeSample__productPrice'
+          aria-label='Free sample - no cost'
+        >
           {{- 'templates.cart.cart_free_sample_badge_text' | t -}}
         </span>
       </div>
