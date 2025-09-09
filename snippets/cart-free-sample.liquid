@@ -76,6 +76,7 @@
   data-cart-total='{{ cart_total }}'
   data-sample-product-id='{{ sample_product.variants.first.id }}'
   data-currency='{{ cart.currency.symbol }}'
+  data-progress-message='{{ progress_message | escape }}'
 >
   <div class='cartFreeSample__progressContainer'>
     <div class='cartFreeSample__progressTrack'>

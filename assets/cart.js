@@ -292,6 +292,57 @@ class CartItems extends HTMLElement {
       });
   }
 
+  updateFreeSampleDisplay(freeProductSample, cartTotal, threshold, currency) {
+    const remainingAmount = threshold - cartTotal;
+    const progressPercentage = Math.min(
+      Math.round((cartTotal * 100) / threshold),
+      100
+    );
+
+    // Update progress bar
+    const progressFill = freeProductSample.querySelector(
+      '.cartFreeSample__progressFill'
+    );
+    const progressText = freeProductSample.querySelector(
+      '.cartFreeSample__progressPercentage'
+    );
+
+    if (progressFill) {
+      progressFill.style.width = `${progressPercentage}%`;
+    }
+    if (progressText) {
+      progressText.textContent = `${progressPercentage}%`;
+    }
+
+    // Update message content
+    const messageContainer = freeProductSample.querySelector(
+      '.cartFreeSample__message'
+    );
+    if (!messageContainer) return;
+
+    // Get progress message template from a data attribute or use default
+    const progressMessage =
+      freeProductSample.dataset.progressMessage ||
+      'Add [amount] more to get a free sample!';
+
+    if (remainingAmount > 0) {
+      // Show progress message
+      const formattedAmount = new Intl.NumberFormat('pl-PL', {
+        style: 'currency',
+        currency: 'PLN',
+      }).format(remainingAmount / 100);
+
+      const messageText = progressMessage.replace('[amount]', formattedAmount);
+
+      messageContainer.innerHTML = `<span class='cartFreeSample__messageText'>${messageText}</span>`;
+      freeProductSample.classList.remove('cartFreeSample--completed');
+    } else {
+      // Show success message
+      messageContainer.innerHTML = `<span class='cartFreeSample__messageSuccess'>🎉 Congratulations! Free sample unlocked!</span>`;
+      freeProductSample.classList.add('cartFreeSample--completed');
+    }
+  }
+
   freeProductSampleHandler(parsedState) {
     const freeProductSample = document.querySelector('.js-cartFreeSample');
 
@@ -302,6 +353,7 @@ class CartItems extends HTMLElement {
     const threshold = parseInt(freeProductSample.dataset.threshold);
     let sampleProductId = freeProductSample.dataset.sampleProductId;
     const currentCartTotal = parsedState.total_price;
+    const currency = freeProductSample.dataset.currency || 'PLN';
 
     // Check if threshold is reached and sample product is configured
     if (!sampleProductId) {
@@ -322,6 +374,14 @@ class CartItems extends HTMLElement {
 
     // Show component if there are regular products
     freeProductSample.classList.remove('hidden');
+
+    // Update the display with current cart state
+    this.updateFreeSampleDisplay(
+      freeProductSample,
+      currentCartTotal,
+      threshold,
+      currency
+    );
 
     // If threshold not reached, check if we need to remove existing sample
     if (currentCartTotal < threshold) {
@@ -393,6 +453,7 @@ class CartItems extends HTMLElement {
         this.showFreeSampleNotification();
       })
       .catch((error) => {
+        console.error(error);
         // Silently handle errors - could add user notification here
       });
   }
