@@ -59,7 +59,7 @@
 
 {% render 'vite-tag' with '@/cart-free-sample.css' %}
 
-<div
+<aside
   style='--bg-color: {{ settings.cart_free_sample_background_color | default: '#e5e5e538' }}; --cartFreeSampleBarColor: {{ settings.cart_free_sample_bar_color | default: '#1B4A3C' }}; --cartFreeSampleProgressTrackColor: {{ settings.cart_free_sample_progress_track_color | default: '#e5e5e5' }}'
   class='cartFreeSample js-cartFreeSample{% if progress_percentage >= 100 %} cartFreeSample--completed{% endif %}{% if sample_in_cart %} hidden{% endif %}'
   data-threshold='{{ threshold }}'
@@ -68,12 +68,15 @@
   data-currency='{{ cart.currency.symbol }}'
   data-progress-message='{{ progress_message | escape }}'
   data-success-message='{{ success_message | escape }}'
-  role='region'
   aria-label='Free sample progress'
   aria-live='polite'
   aria-atomic='true'
 >
-  <div class='cartFreeSample__progressContainer'>
+  <section
+    class='cartFreeSample__progressContainer'
+    aria-labelledby='progress-label'
+  >
+    <h3 id='progress-label' class='sr-only'>Free sample progress</h3>
     <div
       class='cartFreeSample__progressTrack'
       role='progressbar'
@@ -88,54 +91,55 @@
         aria-hidden='true'
       ></div>
     </div>
-  </div>
+  </section>
 
-  <div class='cartFreeSample__message' aria-live='polite'>
+  <header class='cartFreeSample__message' aria-live='polite'>
     {%- if remaining_amount > 0 -%}
       {%- assign remaining_money = remaining_amount | money -%}
-      <span class='cartFreeSample__messageText' id='free-sample-progress-text'>
+      <p class='cartFreeSample__messageText' id='free-sample-progress-text'>
         {{ progress_message | replace: '[amount]', remaining_money }}
-      </span>
+      </p>
 
     {%- else -%}
-      <span
+      <p
         class='cartFreeSample__messageSuccess'
         id='free-sample-success-text'
       >
         {{ success_message }}
-      </span>
+      </p>
     {%- endif -%}
-  </div>
+  </header>
 
   {%- if sample_product != blank -%}
-    <div
+    <article
       class='cartFreeSample__product'
-      role='group'
       aria-labelledby='free-sample-product-title'
     >
-      <img
-        src='{{ sample_product.featured_image | image_url: width: 60 }}'
-        alt='{{ sample_product.title | escape }}'
-        class='cartFreeSample__productImage'
-        width='60'
-        height='60'
-        loading='lazy'
-        decoding='async'
-      >
-      <div class='cartFreeSample__productInfo'>
-        <span
-          class='cartFreeSample__productTitle'
-          id='free-sample-product-title'
+      <figure class='cartFreeSample__productFigure'>
+        <img
+          src='{{ sample_product.featured_image | image_url: width: 60 }}'
+          alt='{{ sample_product.title | escape }}'
+          class='cartFreeSample__productImage'
+          width='60'
+          height='60'
+          loading='lazy'
+          decoding='async'
         >
-          {{- sample_product.title -}}
-        </span>
-        <span
-          class='cartFreeSample__productPrice'
-          aria-label='Free sample - no cost'
-        >
-          {{- 'templates.cart.cart_free_sample_badge_text' | t -}}
-        </span>
-      </div>
-    </div>
+        <figcaption class='cartFreeSample__productInfo'>
+          <h4
+            class='cartFreeSample__productTitle'
+            id='free-sample-product-title'
+          >
+            {{- sample_product.title -}}
+          </h4>
+          <span
+            class='cartFreeSample__productPrice'
+            aria-label='Free sample - no cost'
+          >
+            {{- 'templates.cart.cart_free_sample_badge_text' | t -}}
+          </span>
+        </figcaption>
+      </figure>
+    </article>
   {%- endif -%}
-</div>
+</aside>

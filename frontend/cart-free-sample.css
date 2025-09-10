@@ -163,11 +163,6 @@
   background: linear-gradient(90deg, #1b4a3c 0%, #2e6b4e 100%);
 }
 
-.cartFreeSample--completed .cartFreeSample__product {
-  background-color: rgba(27, 74, 60, 0.05);
-  border-color: rgba(27, 74, 60, 0.2);
-}
-
 /* Error state */
 .cartFreeSample__error {
   background: #ff6b6b;
@@ -188,4 +183,17 @@
 
 .cartFreeSample__progressFill {
   animation: progressFill 0.8s ease-out;
+}
+
+.cartFreeSample__productFigure {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.cartFreeSample__productTitle {
+  margin: 0;
+  font-size: inherit;
+  font-weight: 600;
 }
