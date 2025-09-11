@@ -57,7 +57,8 @@
   endif
 -%}
 
-{% render 'vite-tag' with '@/cart-free-sample.css' %}
+{% comment %} {% render 'vite-tag' with '@/cart-free-sample.css' %} {% endcomment %}
+{{ 'cart-free-sample.css' | asset_url | stylesheet_tag }}
 
 <aside
   style='--bg-color: {{ settings.cart_free_sample_background_color | default: '#e5e5e538' }}; --cartFreeSampleBarColor: {{ settings.cart_free_sample_bar_color | default: '#1B4A3C' }}; --cartFreeSampleProgressTrackColor: {{ settings.cart_free_sample_progress_track_color | default: '#e5e5e5' }}'
