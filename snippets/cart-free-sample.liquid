@@ -63,33 +63,21 @@
   data-threshold='{{ threshold }}'
   data-cart-total='{{ cart_total }}'
   data-sample-product-id='{{ sample_product.variants.first.id }}'
-  data-currency='{{ cart.currency.symbol }}'
+  data-currency='{{ cart.currency }}'
   data-progress-message='{{ progress_message | escape }}'
   data-success-message='{{ success_message | escape }}'
   aria-label='Free sample progress'
   aria-live='polite'
   aria-atomic='true'
 >
-  <section
-    class='cartFreeSample__progressContainer'
-    aria-labelledby='progress-label'
+  <progress
+    class='cartFreeSample__progress js-cartFreeSampleProgress'
+    value='0'
+    max='100'
+    aria-label='Progress towards free sample: {{ progress_percentage }}% complete'
   >
-    <h3 id='progress-label' class='sr-only'>Free sample progress</h3>
-    <div
-      class='cartFreeSample__progressTrack'
-      role='progressbar'
-      aria-valuenow='{{ progress_percentage }}'
-      aria-valuemin='0'
-      aria-valuemax='100'
-      aria-label='Progress towards free sample: {{ progress_percentage }}% complete'
-    >
-      <div
-        class='cartFreeSample__progressFill'
-        style='width: {{ progress_percentage }}%'
-        aria-hidden='true'
-      ></div>
-    </div>
-  </section>
+    {{ progress_percentage }}%
+  </progress>
 
   <header class='cartFreeSample__message' aria-live='polite'>
     {%- if remaining_amount > 0 -%}

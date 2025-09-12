@@ -312,6 +312,21 @@ class CartItems extends HTMLElement {
     return item.properties && item.properties.free_sample === 'true';
   }
 
+  animateProgressBarCSS(progressElement, targetValue) {
+    // Round target value to nearest 5% for data attributes
+    const roundedTarget = Math.round(targetValue / 5) * 5;
+
+    progressElement.setAttribute('data-animate-to', roundedTarget);
+    progressElement.classList.add('cartFreeSample__progress--animate');
+    progressElement.value = targetValue;
+    progressElement.textContent = `${targetValue}%`;
+
+    // Remove animation class after animation completes
+    setTimeout(() => {
+      progressElement.classList.remove('cartFreeSample__progress--animate');
+    }, 450); // Slightly longer than CSS animation duration
+  }
+
   updateFreeSampleDisplay(freeProductSample, cartTotal, threshold) {
     const remainingAmount = threshold - cartTotal;
     const progressPercentage = Math.min(
@@ -319,22 +334,15 @@ class CartItems extends HTMLElement {
       100
     );
 
-    // Update progress bar
-    const progressFill = freeProductSample.querySelector(
-      '.cartFreeSample__progressFill'
-    );
-    const progressTrack = freeProductSample.querySelector(
-      '.cartFreeSample__progressTrack'
+    const progressElement = freeProductSample.querySelector(
+      '.js-cartFreeSampleProgress'
     );
 
-    if (progressFill) {
-      progressFill.style.width = `${progressPercentage}%`;
-    }
+    if (progressElement) {
+      // Animate progress with CSS animation
+      this.animateProgressBarCSS(progressElement, progressPercentage);
 
-    // Update accessibility attributes for progress bar
-    if (progressTrack) {
-      progressTrack.setAttribute('aria-valuenow', progressPercentage);
-      progressTrack.setAttribute(
+      progressElement.setAttribute(
         'aria-label',
         `Progress towards free sample: ${progressPercentage}% complete`
       );
@@ -355,205 +363,195 @@ class CartItems extends HTMLElement {
       '🎉 Congratulations! Free sample unlocked!';
 
     if (remainingAmount > 0) {
+      const isCountryPL = Shopify.country === 'PL';
       // Show progress message
-      const formattedAmount = new Intl.NumberFormat('pl-PL', {
-        style: 'currency',
-        currency: 'PLN',
-      }).format(remainingAmount / 100);
+      const formattedAmount = new Intl.NumberFormat(
+        `${isCountryPL ? 'pl-PL' : 'en-US'}`,
+        {
+          style: 'currency',
+          currency: `${isCountryPL ? 'PLN' : 'USD'}`,
+        }
+      ).format(remainingAmount / 100);
 
       const messageText = progressMessage.replace('[amount]', formattedAmount);
 
       messageContainer.innerHTML = `<span class='cartFreeSample__messageText' id="free-sample-progress-text">${messageText}</span>`;
-      freeProductSample.classList.remove('cartFreeSample--completed');
     } else {
-      // Show success message
       messageContainer.innerHTML = `<span class='cartFreeSample__messageSuccess' id="free-sample-success-text">${successMessage}</span>`;
-      freeProductSample.classList.add('cartFreeSample--completed');
     }
   }
 
   freeProductSampleHandler(parsedState) {
+    const context = this.prepareSampleContext(parsedState);
+    if (!context.isValid) return;
+
+    this.processSampleComponents(context);
+    this.handleSampleAddition(context);
+  }
+
+  prepareSampleContext(parsedState) {
     const freeProductSamples = document.querySelectorAll('.js-cartFreeSample');
-
-    if (freeProductSamples.length === 0) {
-      return;
-    }
-
-    // Process each free sample component separately
-    freeProductSamples.forEach((freeProductSample, index) => {
-      const threshold = parseInt(freeProductSample.dataset.threshold);
-      let sampleProductId = freeProductSample.dataset.sampleProductId;
-      const currentCartTotal = parsedState.total_price;
-      const currency = freeProductSample.dataset.currency || 'PLN';
-
-      // Check if threshold is reached and sample product is configured
-      if (!sampleProductId) {
-        return; // This will only return from the current forEach iteration
-      }
-
-      // Check if sample is already in cart at page load/refresh - hide component immediately
-      const sampleAlreadyInCartAtStart = parsedState.items.some((item) => {
-        const isSample = this.isSampleProduct(item);
-        const sameVariant =
-          item.variant_id.toString() === sampleProductId.toString();
-        return isSample || sameVariant;
-      });
-
-      if (sampleAlreadyInCartAtStart) {
-        freeProductSample.classList.add('hidden');
-        return; // This will only return from the current forEach iteration
-      }
-
-      // Check if cart is empty (excluding samples) - remove any existing samples
-      const nonSampleItems = parsedState.items.filter(
-        (item) => !this.isSampleProduct(item)
-      );
-
-      // Hide component if cart is completely empty or has no regular products
-      if (parsedState.item_count === 0 || nonSampleItems.length === 0) {
-        freeProductSample.classList.add('hidden');
-        // Note: removeSampleProductIfExists will be called once outside the loop
-        return; // This will only return from the current forEach iteration
-      }
-
-      // Show component if there are regular products
-      freeProductSample.classList.remove('hidden');
-
-      // Update the display with current cart state
-      this.updateFreeSampleDisplay(
-        freeProductSample,
-        currentCartTotal,
-        threshold,
-        currency
-      );
-
-      // If threshold not reached, we'll handle sample removal later outside the loop
-      if (currentCartTotal < threshold) {
-        return; // This will only return from the current forEach iteration
-      }
-
-      // Check if sample is already in cart (check by variant_id AND by _free_sample property)
-      const sampleAlreadyInCart = parsedState.items.some((item) => {
-        // Check if this is a sample product
-        const isSample = this.isSampleProduct(item);
-        // Check if same variant ID
-        const sameVariant =
-          item.variant_id.toString() === sampleProductId.toString();
-        return isSample || sameVariant;
-      });
-
-      // Check if sample is already in cart - if so, hide the component since goal is achieved
-      if (sampleAlreadyInCart) {
-        freeProductSample.classList.add('hidden');
-        return; // This will only return from the current forEach iteration
-      }
-    }); // End of forEach loop
-
-    // Handle sample removal logic once, outside the component loop
-    if (
-      parsedState.item_count === 0 ||
-      parsedState.items.filter((item) => !this.isSampleProduct(item)).length ===
-        0 ||
-      parsedState.total_price <
-        parseInt(
-          document.querySelector('.js-cartFreeSample')?.dataset.threshold || '0'
-        )
-    ) {
-      this.removeSampleProductIfExists(parsedState);
-      return;
-    }
-
-    // Check if we should add a sample (only if any component has threshold reached and no sample exists)
-    const anyThresholdReached = Array.from(freeProductSamples).some(
-      (element) => {
-        const threshold = parseInt(element.dataset.threshold);
-        return parsedState.total_price >= threshold;
-      }
+    const nonSampleItems = parsedState.items.filter(
+      (item) => !this.isSampleProduct(item)
+    );
+    const sampleItems = parsedState.items.filter((item) =>
+      this.isSampleProduct(item)
     );
 
-    if (!anyThresholdReached) {
-      return;
-    }
+    return {
+      samples: freeProductSamples,
+      cartItems: parsedState.items,
+      nonSampleItems,
+      sampleItems,
+      cartTotal: parsedState.total_price,
+      itemCount: parsedState.item_count,
+      currency: window.Shopify?.currency?.active || 'PLN',
+      isValid: freeProductSamples.length > 0,
+    };
+  }
 
-    // Get sample product ID from any component (they should all be the same)
-    const sampleProductId = freeProductSamples[0]?.dataset.sampleProductId;
-    if (!sampleProductId) {
-      return;
-    }
-
-    // Check if sample is already in cart
-    const sampleAlreadyInCart = parsedState.items.some((item) => {
+  isSampleInCart(cartItems, sampleProductId) {
+    return cartItems.some((item) => {
       const isSample = this.isSampleProduct(item);
       const sameVariant =
         item.variant_id.toString() === sampleProductId.toString();
       return isSample || sameVariant;
     });
+  }
 
-    if (sampleAlreadyInCart) {
+  processSampleComponents(context) {
+    context.samples.forEach((sampleComponent) => {
+      const threshold = parseInt(sampleComponent.dataset.threshold);
+      const sampleProductId = sampleComponent.dataset.sampleProductId;
+
+      // Skip if no sample product configured
+      if (!sampleProductId) return;
+
+      // Hide if sample already in cart or cart is empty (non-samples)
+      if (
+        this.isSampleInCart(context.cartItems, sampleProductId) ||
+        context.itemCount === 0 ||
+        context.nonSampleItems.length === 0
+      ) {
+        sampleComponent.classList.add('hidden');
+        return;
+      }
+
+      // Show component if there are regular products
+      sampleComponent.classList.remove('hidden');
+
+      // Update the display with current cart state
+      this.updateFreeSampleDisplay(
+        sampleComponent,
+        context.cartTotal,
+        threshold,
+        context.currency
+      );
+    });
+
+    // Handle sample removal if needed
+    if (
+      context.itemCount === 0 ||
+      context.nonSampleItems.length === 0 ||
+      this.shouldRemoveSamples(context)
+    ) {
+      this.removeSampleProductIfExists({ items: context.cartItems });
+    }
+  }
+
+  shouldRemoveSamples(context) {
+    const anyThreshold = Array.from(context.samples).find((element) => {
+      return parseInt(element.dataset.threshold || '0');
+    });
+
+    if (!anyThreshold) return false;
+
+    const threshold = parseInt(anyThreshold.dataset.threshold);
+    return context.cartTotal < threshold;
+  }
+
+  handleSampleAddition(context) {
+    // Check if any threshold is reached
+    const thresholdReached = Array.from(context.samples).some((element) => {
+      const threshold = parseInt(element.dataset.threshold || '0');
+      return context.cartTotal >= threshold;
+    });
+
+    if (!thresholdReached) return;
+
+    // Get sample product ID from first component
+    const sampleProductId = context.samples[0]?.dataset.sampleProductId;
+    if (
+      !sampleProductId ||
+      this.isSampleInCart(context.cartItems, sampleProductId)
+    ) {
       return;
     }
 
+    this.addSampleToCart(sampleProductId)
+      .then(() => this.handleSampleAddSuccess())
+      .catch((error) => this.handleSampleAddError(error));
+  }
+
+  async addSampleToCart(sampleProductId) {
     const body = JSON.stringify({
       items: [
         {
           id: parseInt(sampleProductId),
           quantity: 1,
-          properties: {
-            free_sample: 'true',
-          },
+          properties: { free_sample: 'true' },
         },
       ],
       sections: this.getSectionsToRender().map((section) => section.section),
       sections_url: window.location.pathname,
     });
 
-    fetch(`${routes.cart_add_url}`, { ...fetchConfig(), ...{ body } })
-      .then((response) => {
-        return response.text();
-      })
-      .then((responseText) => {
-        const newState = JSON.parse(responseText);
+    const response = await fetch(`${routes.cart_add_url}`, {
+      ...fetchConfig(),
+      ...{ body },
+    });
 
-        // Check for errors in response
-        if (newState.errors || newState.status) {
-          throw new Error(
-            `Cart API Error: ${newState.errors || newState.description || 'Unknown error'}`
-          );
-        }
+    const responseText = await response.text();
+    const newState = JSON.parse(responseText);
 
-        // Update cart sections with new state including free sample
+    if (newState.errors || newState.status) {
+      throw new Error(
+        `Cart API Error: ${newState.errors || newState.description || 'Unknown error'}`
+      );
+    }
 
-        this.getSectionsToRender().forEach((section) => {
-          const elementToReplace =
-            document
-              .getElementById(section.id)
-              .querySelector(section.selector) ||
-            document.getElementById(section.id);
+    // Update cart sections
+    this.getSectionsToRender().forEach((section) => {
+      const elementToReplace =
+        document.getElementById(section.id)?.querySelector(section.selector) ||
+        document.getElementById(section.id);
 
-          if (elementToReplace && newState.sections[section.section]) {
-            elementToReplace.innerHTML = this.getSectionInnerHTML(
-              newState.sections[section.section],
-              section.selector
-            );
-          }
-        });
+      if (elementToReplace && newState.sections[section.section]) {
+        elementToReplace.innerHTML = this.getSectionInnerHTML(
+          newState.sections[section.section],
+          section.selector
+        );
+      }
+    });
 
-        // Hide all free sample components since the sample has been added successfully
-        const allFreeProductSamples =
-          document.querySelectorAll('.js-cartFreeSample');
-        allFreeProductSamples.forEach((component, index) => {
-          setTimeout(() => {
-            component.classList.add('hidden');
-          }, 2000);
-        });
+    return newState;
+  }
 
-        // Show success notification
-        this.showFreeSampleNotification();
-      })
-      .catch((error) => {
-        console.error(error);
-        // Silently handle errors - could add user notification here
-      });
+  /**
+   * Handles successful sample addition
+   */
+  handleSampleAddSuccess() {
+    // Hide all free sample components after 2 seconds
+    const allSampleComponents = document.querySelectorAll('.js-cartFreeSample');
+    allSampleComponents.forEach((component) => {
+      setTimeout(() => component.classList.add('hidden'), 2000);
+    });
+
+    this.showFreeSampleNotification();
+  }
+
+  handleSampleAddError(error) {
+    console.error('Free sample error:', error);
   }
 
   removeSampleProductIfExists(parsedState) {
@@ -573,7 +571,7 @@ class CartItems extends HTMLElement {
     });
 
     const body = JSON.stringify({
-      updates: updates,
+      updates,
       sections: this.getSectionsToRender().map((section) => section.section),
       sections_url: window.location.pathname,
     });
@@ -606,7 +604,7 @@ class CartItems extends HTMLElement {
         // Show free sample components again since the sample has been removed
         const allFreeProductSamples =
           document.querySelectorAll('.js-cartFreeSample');
-        allFreeProductSamples.forEach((component, index) => {
+        allFreeProductSamples.forEach((component) => {
           // Only show if cart has non-sample items and threshold not yet reached
           const threshold = parseInt(component.dataset.threshold);
           if (newState.total_price < threshold && newState.item_count > 0) {
@@ -624,7 +622,7 @@ class CartItems extends HTMLElement {
         });
       })
       .catch((error) => {
-        // Silently handle errors
+        console.error('Free sample error:', error);
       });
   }
 

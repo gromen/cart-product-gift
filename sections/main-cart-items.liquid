@@ -27,6 +27,9 @@
 
 <cart-items class='gradient color-{{ section.settings.color_scheme }} isolate{% if cart == empty %} is-empty{% else %} section-{{ section.id }}-padding{% endif %}'>
   <div class='page-width'>
+    {%- unless cart == empty -%}
+      {% render 'cart-free-sample' %}
+    {%- endunless -%}
     <div class='title-wrapper-with-link'>
       <h1 class='title title--primary'>{{ 'sections.cart.title' | t }}</h1>
       <a
@@ -36,10 +39,6 @@
         {{- 'general.continue_shopping' | t -}}
       </a>
     </div>
-
-    {%- unless cart == empty -%}
-      {% render 'cart-free-sample' %}
-    {%- endunless -%}
 
     <div class='cart__warnings'>
       <h1 class='cart__empty-text'>{{ 'sections.cart.empty' | t }}</h1>
@@ -163,7 +162,10 @@
                       {% endif %}
 
                       {%- if is_free_sample -%}
-                        <span class='cart-item__free-sample-badge' tabindex='0'>
+                        <span
+                          class='cartFreeSample__badgeFreeSample'
+                          tabindex='0'
+                        >
                           {{-
                             'templates.cart.cart_free_sample_badge_text'
                             | t
