@@ -2,20 +2,6 @@ cart-items .title-wrapper-with-link {
   margin-top: 0;
 }
 
-.cart-item__free-sample-badge {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  color: #1b4a3c;
-  background-color: rgba(27, 74, 60, 0.1);
-  padding: 2px 8px;
-  border-radius: 4px;
-  margin-top: 6px;
-  margin-left: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
 .cart-items td,
 .cart-items th {
   padding: 0;

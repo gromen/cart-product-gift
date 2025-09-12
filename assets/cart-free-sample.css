@@ -1,5 +1,5 @@
 .cartFreeSample {
-  background-color: var(--bg-color);
+  background-color: var(--bgColor);
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 16px;
@@ -97,7 +97,7 @@
   }
 }
 
-.cartFreeSample__productPrice {
+.cartFreeSample__badgeFreeSample {
   font-size: 12px;
   font-weight: 700;
   color: #1b4a3c;
@@ -156,11 +156,6 @@
   .cartFreeSample__product {
     padding: 20px;
   }
-}
-
-/* States */
-.cartFreeSample--completed .cartFreeSample__progressFill {
-  background: linear-gradient(90deg, #1b4a3c 0%, #2e6b4e 100%);
 }
 
 /* Error state */

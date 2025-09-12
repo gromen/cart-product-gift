@@ -57,12 +57,9 @@
   endif
 -%}
 
-{% comment %} {% render 'vite-tag' with '@/cart-free-sample.css' %} {% endcomment %}
-{{ 'cart-free-sample.css' | asset_url | stylesheet_tag }}
-
 <aside
-  style='--bg-color: {{ settings.cart_free_sample_background_color | default: '#e5e5e538' }}; --cartFreeSampleBarColor: {{ settings.cart_free_sample_bar_color | default: '#1B4A3C' }}; --cartFreeSampleProgressTrackColor: {{ settings.cart_free_sample_progress_track_color | default: '#e5e5e5' }}'
-  class='cartFreeSample js-cartFreeSample{% if progress_percentage >= 100 %} cartFreeSample--completed{% endif %}{% if sample_in_cart %} hidden{% endif %}'
+  style='--bgColor: {{ settings.cart_free_sample_background_color | default: '#e5e5e538' }}; --cartFreeSampleBarColor: {{ settings.cart_free_sample_bar_color | default: '#1B4A3C' }}; --cartFreeSampleProgressTrackColor: {{ settings.cart_free_sample_progress_track_color | default: '#e5e5e5' }}'
+  class='cartFreeSample js-cartFreeSample{% if sample_in_cart %} hidden{% endif %}'
   data-threshold='{{ threshold }}'
   data-cart-total='{{ cart_total }}'
   data-sample-product-id='{{ sample_product.variants.first.id }}'
@@ -123,8 +120,6 @@
           class='cartFreeSample__productImage'
           width='60'
           height='60'
-          loading='lazy'
-          decoding='async'
         >
         <figcaption class='cartFreeSample__productInfo'>
           <h4
@@ -134,7 +129,7 @@
             {{- sample_product.title -}}
           </h4>
           <span
-            class='cartFreeSample__productPrice'
+            class='cartFreeSample__badgeFreeSample'
             aria-label='Free sample - no cost'
           >
             {{- 'templates.cart.cart_free_sample_badge_text' | t -}}
