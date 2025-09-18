@@ -281,7 +281,7 @@ class CartItems extends HTMLElement {
         );
 
         CartPerformance.measureFromEvent(`${eventTarget}:user-action`, event);
-        this.freeProductSampleHandler(parsedState);
+        // this.freeProductSampleHandler(parsedState);
         publish(PUB_SUB_EVENTS.cartUpdate, {
           source: 'cart-items',
           cartData: parsedState,
@@ -385,8 +385,8 @@ class CartItems extends HTMLElement {
     const context = this.prepareSampleContext(parsedState);
     if (!context.isValid) return;
 
-    this.processSampleComponents(context);
-    this.handleSampleAddition(context);
+    // this.processSampleComponents(context);
+    // this.handleSampleAddition(context);
   }
 
   prepareSampleContext(parsedState) {

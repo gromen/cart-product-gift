@@ -10,6 +10,18 @@
   gap: 16px;
 }
 
+.cartFreeSample--hidden {
+  height: 0 !important;
+  width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  cursor: none !important;
+}
+
 .cartFreeSample__progress {
   width: 100%;
   height: 10px;

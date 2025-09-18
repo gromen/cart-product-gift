@@ -48,6 +48,12 @@
   assign cart_total = cart.total_price | default: 0
   assign remaining_amount = threshold | minus: cart_total
   assign progress_percentage = cart_total | times: 100 | divided_by: threshold
+
+  if sample_in_cart != blank or cart_total >= threshold
+    assign should_hide = true
+  else
+    assign should_hide = false
+  endif
 %}
 
 {%- liquid
@@ -56,74 +62,78 @@
     assign progress_percentage = 100
   endif
 -%}
-
-<aside
-  style='--bgColor: {{ settings.cart_free_sample_background_color | default: '#e5e5e538' }}; --cartFreeSampleBarColor: {{ settings.cart_free_sample_bar_color | default: '#1B4A3C' }}; --cartFreeSampleProgressTrackColor: {{ settings.cart_free_sample_progress_track_color | default: '#e5e5e5' }}'
-  class='cartFreeSample js-cartFreeSample{% if sample_in_cart %} hidden{% endif %}'
-  data-threshold='{{ threshold }}'
-  data-cart-total='{{ cart_total }}'
-  data-sample-product-id='{{ sample_product.variants.first.id }}'
-  data-currency='{{ cart.currency }}'
-  data-progress-message='{{ progress_message | escape }}'
-  data-success-message='{{ success_message | escape }}'
-  aria-label='Free sample progress'
-  aria-live='polite'
-  aria-atomic='true'
->
-  <progress
-    class='cartFreeSample__progress js-cartFreeSampleProgress'
-    value='0'
-    max='100'
-    aria-label='Progress towards free sample: {{ progress_percentage }}% complete'
+<cart-free-sample>
+  <p class='js-cartFreeSampleSuccessMessage {%if should_hide == false %}cartFreeSample--hidden{% endif %}'>
+    {{ success_message }}
+  </p>
+  <aside
+    style='--bgColor: {{ settings.cart_free_sample_background_color | default: '#e5e5e538' }}; --cartFreeSampleBarColor: {{ settings.cart_free_sample_bar_color | default: '#1B4A3C' }}; --cartFreeSampleProgressTrackColor: {{ settings.cart_free_sample_progress_track_color | default: '#e5e5e5' }}'
+    class='cartFreeSample js-cartFreeSample{% if should_hide %} cartFreeSample--hidden{% endif %}'
+    data-threshold='{{ threshold }}'
+    data-cart-total='{{ cart_total }}'
+    data-sample-product-id='{{ sample_product.variants.first.id }}'
+    data-currency='{{ cart.currency.iso_code }}'
+    data-progress-message='{{ progress_message | escape }}'
+    data-success-message='{{ success_message | escape }}'
+    aria-label='Free sample progress'
+    aria-live='polite'
+    aria-atomic='true'
   >
-    {{ progress_percentage }}%
-  </progress>
-
-  <header class='cartFreeSample__message' aria-live='polite'>
-    {%- if remaining_amount > 0 -%}
-      {%- assign remaining_money = remaining_amount | money -%}
-      <p class='cartFreeSample__messageText' id='free-sample-progress-text'>
-        {{ progress_message | replace: '[amount]', remaining_money }}
-      </p>
-
-    {%- else -%}
-      <p
-        class='cartFreeSample__messageSuccess'
-        id='free-sample-success-text'
-      >
-        {{ success_message }}
-      </p>
-    {%- endif -%}
-  </header>
-
-  {%- if sample_product != blank -%}
-    <article
-      class='cartFreeSample__product'
-      aria-labelledby='free-sample-product-title'
+    <progress
+      class='cartFreeSample__progress js-cartFreeSampleProgress'
+      value='0'
+      max='100'
+      aria-label='Progress towards free sample: {{ progress_percentage }}% complete'
     >
-      <figure class='cartFreeSample__productFigure'>
-        <img
-          src='{{ sample_product.featured_image | image_url: width: 60 }}'
-          alt='{{ sample_product.title | escape }}'
-          class='cartFreeSample__productImage'
-          width='60'
-          height='60'
+      {{ progress_percentage }}%
+    </progress>
+
+    <header class='cartFreeSample__message' aria-live='polite'>
+      {%- if remaining_amount > 0 -%}
+        {%- assign remaining_money = remaining_amount | money -%}
+        <p class='cartFreeSample__messageText' id='free-sample-progress-text'>
+          {{ progress_message | replace: '[amount]', remaining_money }}
+        </p>
+
+      {%- else -%}
+        <p
+          class='cartFreeSample__messageSuccess'
+          id='free-sample-success-text'
         >
-        <figcaption class='cartFreeSample__productInfo'>
-          <h4
-            class='cartFreeSample__productTitle'
-            id='free-sample-product-title'
+          {{ success_message }}
+        </p>
+      {%- endif -%}
+    </header>
+
+    {%- if sample_product != blank -%}
+      <article
+        class='cartFreeSample__product'
+        aria-labelledby='free-sample-product-title'
+      >
+        <figure class='cartFreeSample__productFigure'>
+          <img
+            src='{{ sample_product.featured_image | image_url: width: 60 }}'
+            alt='{{ sample_product.title | escape }}'
+            class='cartFreeSample__productImage'
+            width='60'
+            height='60'
           >
-            {{- sample_product.title -}}
-          </h4>
-          <span
-            class='cartFreeSample__badgeFreeSample'
-            aria-label='Free sample - no cost'
-          >
-            {{- 'templates.cart.cart_free_sample_badge_text' | t -}}
-          </span>
-        </figcaption>
-      </figure>
-    </article>
-  {%- endif -%}
-</aside>
+          <figcaption class='cartFreeSample__productInfo'>
+            <h4
+              class='cartFreeSample__productTitle'
+              id='free-sample-product-title'
+            >
+              {{- sample_product.title -}}
+            </h4>
+            <span
+              class='cartFreeSample__badgeFreeSample'
+              aria-label='Free sample - no cost'
+            >
+              {{- 'templates.cart.cart_free_sample_badge_text' | t -}}
+            </span>
+          </figcaption>
+        </figure>
+      </article>
+    {%- endif -%}
+  </aside>
+</cart-free-sample>

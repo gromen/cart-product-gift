@@ -2,8 +2,25 @@
 <html class='js' lang='{{ request.locale.iso_code }}'>
   <head>
     <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width,initial-scale=1'>
+    <title>
+      {{ page_title }}
+      {%- if current_tags %}
+        &ndash; tagged "{{ current_tags | join: ', ' }}"
+      {%- endif -%}
+      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %}
+        &ndash; {{ shop.name -}}
+      {%- endunless -%}
+    </title>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    {%- unless settings.type_header_font.system?
+      and settings.type_body_font.system?
+    -%}
+      <link rel='preconnect' href='https://fonts.shopifycdn.com' crossorigin>
+    {%- endunless -%}
+    {{ content_for_header }}
+
     <meta name='theme-color' content=''>
     <link rel='canonical' href='{{ canonical_url }}'>
 
@@ -15,44 +32,9 @@
       >
     {%- endif -%}
 
-    {%- unless settings.type_header_font.system?
-      and settings.type_body_font.system?
-    -%}
-      <link rel='preconnect' href='https://fonts.shopifycdn.com' crossorigin>
-    {%- endunless -%}
-
-    <title>
-      {{ page_title }}
-      {%- if current_tags %}
-        &ndash; tagged "{{ current_tags | join: ', ' }}"
-      {%- endif -%}
-      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
-      {%- unless page_title contains shop.name %}
-        &ndash; {{ shop.name -}}
-      {%- endunless -%}
-    </title>
-
     {% if page_description %}
       <meta name='description' content='{{ page_description | escape }}'>
     {% endif %}
-
-    {% render 'meta-tags' %}
-
-    <script src='{{ 'constants.js' | asset_url }}' defer='defer'></script>
-    <script src='{{ 'pubsub.js' | asset_url }}' defer='defer'></script>
-    <script src='{{ 'global.js' | asset_url }}' defer='defer'></script>
-    <script
-      src='{{ 'details-disclosure.js' | asset_url }}'
-      defer='defer'
-    ></script>
-    <script src='{{ 'details-modal.js' | asset_url }}' defer='defer'></script>
-    <script src='{{ 'search-form.js' | asset_url }}' defer='defer'></script>
-
-    {%- if settings.animations_reveal_on_scroll -%}
-      <script src='{{ 'animations.js' | asset_url }}' defer='defer'></script>
-    {%- endif -%}
-
-    {{ content_for_header }}
 
     {%- liquid
       assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'
@@ -67,6 +49,7 @@
       {{ body_font_bold_italic | font_face: font_display: 'swap' }}
       {{ settings.type_header_font | font_face: font_display: 'swap' }}
 
+      {% assign scheme_classes = '' %}
       {% for scheme in settings.color_schemes -%}
         {% assign scheme_classes = scheme_classes | append: ', .color-' | append: scheme.id %}
         {% if forloop.index == 1 -%}
@@ -337,11 +320,30 @@
       >
     {%- endif -%}
 
+    <script src='{{ 'constants.js' | asset_url }}' defer='defer'></script>
+    <script src='{{ 'pubsub.js' | asset_url }}' defer='defer'></script>
+    <script src='{{ 'global.js' | asset_url }}' defer='defer'></script>
+    <script
+      src='{{ 'details-disclosure.js' | asset_url }}'
+      defer='defer'
+    ></script>
+    <script src='{{ 'details-modal.js' | asset_url }}' defer='defer'></script>
+    <script src='{{ 'search-form.js' | asset_url }}' defer='defer'></script>
+
+    {%- if settings.animations_reveal_on_scroll -%}
+      <script src='{{ 'animations.js' | asset_url }}' defer='defer'></script>
+    {%- endif -%}
+
+    {%- if settings.cart_type == 'drawer' -%}
+      <script src='{{ 'cart-drawer.js' | asset_url }}' defer='defer'></script>
+    {%- endif -%}
+
     <script>
       if (Shopify.designMode) {
         document.documentElement.classList.add('shopify-design-mode');
       }
     </script>
+    {% render 'meta-tags' %}
   </head>
 
   <body class='gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}'>
@@ -352,6 +354,16 @@
     {%- if settings.cart_type == 'drawer' -%}
       {%- render 'cart-drawer' -%}
     {%- endif -%}
+
+    {% if template.name == 'cart'
+      or settings.cart_type == 'drawer'
+      and settings.cart_free_sample_enabled
+    %}
+      <script
+        src='{{ 'cart-free-sample.js' | asset_url }}'
+        defer='defer'
+      ></script>
+    {% endif %}
 
     {% sections 'header-group' %}
 
